@@ -24,7 +24,6 @@ export const getList = async (req, res) => {
 
 export const addOrder = async (req, res) => {
 	const { code, url, name } = req.body;
-	console.log(code, url, name);
 	try {
 		let list = await List.findOne({ name });
 		if (!list) {
@@ -56,5 +55,24 @@ export const addOrder = async (req, res) => {
 			return res.status(400).json({ message: "Code must be unique" });
 		}
 		return res.status(500).json({ message: "Server error", error });
+	}
+};
+
+export const deleteOrder = async (req, res) => {
+	try {
+		const { code } = req.params;
+
+		const updatedList = await List.findOneAndUpdate({ "orders.code": code }, { $pull: { orders: { code } } }, { new: true });
+
+		if (!updatedList) {
+			return res.status(404).json({ message: "Order with the specified code not found in any list" });
+		}
+
+		res.status(200).json({
+			message: `Order with code ${code} has been deleted`,
+			list: updatedList,
+		});
+	} catch (error) {
+		res.status(500).json({ message: "Server error", error });
 	}
 };
