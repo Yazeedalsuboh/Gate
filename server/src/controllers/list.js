@@ -1,5 +1,5 @@
 import { List, Order } from "../models/list.js";
-
+// Flag
 export const getAll = async (req, res) => {
 	try {
 		const lists = await List.find();
