@@ -19,6 +19,11 @@ export const addOrders = createAsyncThunk("orders/add", async (order) => {
 	return response.data;
 });
 
+export const deleteOrder = createAsyncThunk("orders/delete", async (code) => {
+	const response = await axios.delete(`http://localhost:4000/api/list/order/${code}`);
+	return { data: response.data, code };
+});
+
 export const orderSlice = createSlice({
 	name: "order",
 	initialState,
@@ -57,6 +62,19 @@ export const orderSlice = createSlice({
 		builder.addCase(addOrders.rejected, (state, action) => {
 			state.loading = false;
 			state.error = action.error.message || "Failed to add order";
+		});
+		builder.addCase(deleteOrder.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(deleteOrder.fulfilled, (state, action) => {
+			const code = action.payload.code;
+			state.loading = false;
+			state.error = "";
+			state.orders = state.orders.filter((order) => order.code === code);
+		});
+		builder.addCase(deleteOrder.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.error.message || "Failed to delete order";
 		});
 	},
 });
