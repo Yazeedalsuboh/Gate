@@ -5,6 +5,8 @@ const initialState = {
 	loading: false,
 	error: "",
 	lists: [],
+	orders: [],
+	url: "",
 };
 
 export const getLists = createAsyncThunk("orders/lists", async () => {
@@ -20,6 +22,17 @@ export const addOrders = createAsyncThunk("orders/add", async (order) => {
 export const orderSlice = createSlice({
 	name: "order",
 	initialState,
+	reducers: {
+		ordersByList: (prevState, action) => {
+			console.log("ordersByList", prevState.lists);
+			const selectedList = prevState.lists.find((ls) => ls.name === action.payload);
+			if (selectedList) {
+				prevState.orders = selectedList.orders || [];
+			} else {
+				prevState.orders = [];
+			}
+		},
+	},
 	extraReducers: (builder) => {
 		builder.addCase(getLists.pending, (state) => {
 			state.loading = true;
